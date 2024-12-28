@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NUM_EMPLOYEES 10
+
+typedef struct {
+    char name[50];
+    float base_salary;
+    float overtime_hours;
+    float overtime_rate;
+    float insurance;
+    float net_salary;
+} Employee;
+
+void calculateSalary(Employee *emp) {
+    float overtime_pay = emp->overtime_hours * emp->overtime_rate;
+    emp->net_salary = emp->base_salary + overtime_pay - emp->insurance;
+}
+
+void generatePayslip(Employee emp, FILE *file) {
+    fprintf(file, "============================\n");
+    fprintf(file, "Name: %s\n", emp.name);
+    fprintf(file, "Base Salary: %.2f\n", emp.base_salary);
+    fprintf(file, "Overtime Pay: %.2f\n", emp.overtime_hours * emp.overtime_rate);
+    fprintf(file, "Insurance Deduction: %.2f\n", emp.insurance);
+    fprintf(file, "Net Salary: %.2f\n", emp.net_salary);
+    fprintf(file, "============================\n\n");
+}
+
+int main() {
+    Employee employees[NUM_EMPLOYEES];
+    FILE *file = fopen("payslips.txt", "w");
+
+    if (file == NULL) {
+        printf("Error opening file for writing!\n");
+        return 1;
+    }
+
+    printf("Enter details for %d employees:\n", NUM_EMPLOYEES);
+    for (int i = 0; i < NUM_EMPLOYEES; i++) {
+        printf("\nEmployee %d:\n", i + 1);
+        printf("Name: ");
+        scanf(" %[^\n]", employees[i].name);
+        printf("Base Salary: ");
+        scanf("%f", &employees[i].base_salary);
+        printf("Overtime Hours: ");
+        scanf("%f", &employees[i].overtime_hours);
+        printf("Overtime Rate per Hour: ");
+        scanf("%f", &employees[i].overtime_rate);
+        printf("Insurance Deduction: ");
+        scanf("%f", &employees[i].insurance);
+
+        calculateSalary(&employees[i]);
+        generatePayslip(employees[i], file);
+    }
+
+    fclose(file);
+
+    printf("\nPayslips have been generated and saved to 'payslips.txt'.\n");
+    return 0;
+}
